@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
     int  velocidad = 9600;  // default
    	char texto[bufmax]="Hola Mundo";
    	char rutaArchivo[bufmax]="";
-   	int keep=0;
+   	int keep=1;
    	char sn[2]="S";
    	int i=0;
     
@@ -47,7 +47,6 @@ int main(int argc, char *argv[]){
 
 	if (argc==1){
 		modoUso();
-		printf("Faltan parametros de conexión\n");
 	}
 
 	/* Parseo de opciones */
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]){
         {"baud",       required_argument, 0, 'b'},
         {"keep",       required_argument, 0, 'k'},
         {"send",       required_argument, 0, 's'},
-        {"sendFile",   required_argument, 0, 'f'},
+        {"send-file",  required_argument, 0, 'f'},
         {NULL,         0,                 0, 0}
     };
 
@@ -116,8 +115,9 @@ int main(int argc, char *argv[]){
 		        	
 	        		printf("Enviando texto: %s ...\n",texto);
 	        		Write_Port(fd,texto,bufmax);
-	        		usleep(1000 * 1000 ); // sleep milliseconds            
+	        		usleep(5 * 100000 ); // sleep milliseconds            
 
+	        		/*
 	        		if(i==15){
 
 	        			printf("Desea continuar enviando \n");
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]){
 	        				keep=0;
 	        			else
 	        				i=0;
-	        		}
+	        		}*/
 
 	        		i++;
 		        		        		
