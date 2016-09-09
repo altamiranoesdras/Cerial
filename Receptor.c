@@ -13,15 +13,14 @@ void error(char* msg){
 }
 
 void modoUso(void){
-    printf("Modo de uso: ./Emisor -b <bps> -p <puerto> [Opciones]\n"
+    printf("Modo de uso: ./Receptor -b <bps> -p <puerto> [Opciones]\n"
     "\n"
     "Opciones:\n"
     "  -h, --help                 Imprime modo de uso\n"
     "  -b, --baud=baudrate        Baudrate (bps) (velocidad) (9600 por defecto)\n"
     "  -p, --port=serialport      Puerto o adaptador conectado (\"/dev/ttyUSB0\")\n"
-    "  -s, --send=string          Envia una cadena de texto\n"
-    "  -f, --sendFile=ruta            Envia un archivo de texto\n"
- 
+    "  -r, --receive              Recibe texto\n"
+    "  -R, --receive-file=string  Recibe un archivo\n"
     "\n"
     "Nota: El orden es importante. Configure '-b' baudrate antes de arbrir el puerto '-p'. \n"
     "\n");
@@ -38,13 +37,12 @@ int main(int argc, char *argv[]){
     char strport[bufmax]="/dev/ttyUSB0";
     int  velocidad = 9600;  // default
    	char texto[bufmax]="Hola Mundo";
-   	char rutaArchivo[bufmax]="";
+   	char rutaGuarda[bufmax]="";
     
     
 
 	if (argc==1){
 		modoUso();
-		printf("Faltan parametros de conexión\n");
 	}
 
 	/* Parseo de opciones */
@@ -97,7 +95,7 @@ int main(int argc, char *argv[]){
 
 	        break;
 	        
-	        case 's':
+	        case 'r':
 	        	if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
 	        	strcpy(texto,optarg);
@@ -108,11 +106,11 @@ int main(int argc, char *argv[]){
 	            
             break;
 
-            case 'f':
+            case 'R':
 				if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
-	        	strcpy(rutaArchivo,optarg);
-	        	printf("Enviando archivo: %s ...\n",rutaArchivo);
+	        	strcpy(rutaGuarda,optarg);
+	        	printf("Enviando archivo: %s ...\n",rutaGuarda);
 	            
             break;
         
