@@ -38,6 +38,7 @@ int main(int argc, char *argv[]){
     int  velocidad = 9600;  // default
    	char texto[bufmax]="Hola Mundo";
    	char rutaGuarda[bufmax]="";
+   	int n;
     
     
 
@@ -48,18 +49,18 @@ int main(int argc, char *argv[]){
 	/* Parseo de opciones */
     int option_index = 0, opt;
     static struct option loptions[] = {
-        {"help",       no_argument,       0, 'h'},
-        {"port",       required_argument, 0, 'p'},
-        {"baud",       required_argument, 0, 'b'},
-        {"send",       required_argument, 0, 's'},
-        {"sendFile",   required_argument, 0, 'f'},
-        {NULL,         0,                 0, 0}
+        {"help",          no_argument,       0, 'h'},
+        {"port",          required_argument, 0, 'p'},
+        {"baud",          required_argument, 0, 'b'},
+        {"receive",       no_argument,       0, 'r'},
+        {"receive-file",  required_argument, 0, 'R'},
+        {NULL,                            0, 0,  0 }
     };
 
     while(1) {
 
     	//le los argumetos y/o opciones
-        opt = getopt_long (argc, argv, "hp:b:s:f:",loptions, &option_index);
+        opt = getopt_long (argc, argv, "hp:b:s:rR:",loptions, &option_index);
 
         //cuando ya no hay mas opciones o argumento que ler
         if (opt==-1) break;
@@ -98,19 +99,24 @@ int main(int argc, char *argv[]){
 	        case 'r':
 	        	if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
-	        	strcpy(texto,optarg);
-	        	printf("Enviando texto: %s ...\n",texto);
+	        	printf("Esperando texto del emisor..\n");
 
-	        	Write_Port(fd,texto,bufmax);            
-	            Close_Port(fd);
-	            
+	        	//Esperar hasta que se llene el bufer
+	        	while(Kbhit_Port(fd)<bufmax);
+
+    			n=Read_Port(fd,texto,bufmax);
+
+	        	//strcpy(texto,optarg);
+	        	printf("El texto recibido es: %s ...\n",texto);
+          
+	            Close_Port(fd);	            
             break;
 
             case 'R':
 				if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
 	        	strcpy(rutaGuarda,optarg);
-	        	printf("Enviando archivo: %s ...\n",rutaGuarda);
+	        	printf("Recibiendo archivo...\n");
 	            
             break;
         
