@@ -6,7 +6,6 @@
 #include <string.h>   // para manejar cadenas de texto
 #include <stdlib.h>
 
-
 void error(char* msg){
     fprintf(stderr, "%s\n",msg);
     exit(EXIT_FAILURE);
@@ -19,8 +18,9 @@ void modoUso(void){
     "  -h, --help                 Imprime modo de uso\n"
     "  -b, --baud=baudrate        Baudrate (bps) (velocidad) (9600 por defecto)\n"
     "  -p, --port=serialport      Puerto o adaptador conectado (\"/dev/ttyUSB0\")\n"
+    "  -k, --keep                 Mantien enviando el texto en intervalos de un segundo\n"
     "  -s, --send=string          Envia una cadena de texto\n"
-    "  -f, --sendFile=ruta            Envia un archivo de texto\n"
+    "  -f, --send-file=ruta       Envia un archivo de texto\n"
  
     "\n"
     "Nota: El orden es importante. Configure '-b' baudrate antes de arbrir el puerto '-p'. \n"
@@ -39,6 +39,9 @@ int main(int argc, char *argv[]){
     int  velocidad = 9600;  // default
    	char texto[bufmax]="Hola Mundo";
    	char rutaArchivo[bufmax]="";
+   	int keep=0;
+   	char sn[2]="S";
+   	int i=0;
     
     
 
@@ -53,6 +56,7 @@ int main(int argc, char *argv[]){
         {"help",       no_argument,       0, 'h'},
         {"port",       required_argument, 0, 'p'},
         {"baud",       required_argument, 0, 'b'},
+        {"keep",       required_argument, 0, 'k'},
         {"send",       required_argument, 0, 's'},
         {"sendFile",   required_argument, 0, 'f'},
         {NULL,         0,                 0, 0}
@@ -61,7 +65,7 @@ int main(int argc, char *argv[]){
     while(1) {
 
     	//le los argumetos y/o opciones
-        opt = getopt_long (argc, argv, "hp:b:s:f:",loptions, &option_index);
+        opt = getopt_long (argc, argv, "hp:b:ks:f:",loptions, &option_index);
 
         //cuando ya no hay mas opciones o argumento que ler
         if (opt==-1) break;
@@ -96,14 +100,41 @@ int main(int argc, char *argv[]){
 	            Configure_Port(fd,velocidad,(char*) "8N1");   
 
 	        break;
+
+	        case 'k':
+	        	keep=1;
+	        	break;
 	        
 	        case 's':
 	        	if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
 	        	strcpy(texto,optarg);
-	        	printf("Enviando texto: %s ...\n",texto);
+	        		
+	        	
+	        	do
+	        	{
+		        	
+	        		printf("Enviando texto: %s ...\n",texto);
+	        		Write_Port(fd,texto,bufmax);
+	        		usleep(1000 * 1000 ); // sleep milliseconds            
 
-	        	Write_Port(fd,texto,bufmax);            
+	        		if(i==15){
+
+	        			printf("Desea continuar enviando \n");
+	        			scanf("%s",sn);
+
+	        			if(strcmp(sn,"n")==0 || strcmp(sn,"N")==0) 
+	        				keep=0;
+	        			else
+	        				i=0;
+	        		}
+
+	        		i++;
+		        		        		
+	        	} while (keep);
+
+
+
 	            Close_Port(fd);
 	            
             break;
