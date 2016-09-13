@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
 	            //si no se pudo abrir el puerto
 	            if (fd == -1) exit(EXIT_SUCCESS);
 
-	            Configure_Port(fd,velocidad,(char*) "8N1");   
+	            Configure_Port(fd,B9600,"8N1");   
 
 	        break;
 
