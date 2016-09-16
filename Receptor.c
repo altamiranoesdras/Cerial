@@ -20,7 +20,7 @@ void modoUso(void){
     "  -b, --baud=baudrate        Baudrate (bps) (velocidad) (9600 por defecto)\n"
     "  -p, --port=serialport      Puerto o adaptador conectado (\"/dev/ttyUSB0\")\n"
     "  -r, --receive              Recibe texto\n"
-    "  -R, --receive-file=string  Recibe un archivo\n"
+    "  -R, --receive-file=nombre  Recibe un archivo\n"
     "\n"
     "Nota: El orden es importante. Configure '-b' baudrate antes de arbrir el puerto '-p'. \n"
     "\n");
@@ -29,7 +29,7 @@ void modoUso(void){
 
 int main(int argc, char *argv[]){
 
-	const int bufmax = 256;//maximo tamaño de las cadenas
+	int bufmax = 256;//maximo tamaño de las cadenas
 
 	HANDLE fd = -1; //manejador
     DCB OldConf; //configuracion antigua
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
     int  velocidad = 9600;  // default
    	char texto[bufmax]="Hola Mundo";
    	char rutaGuarda[bufmax]="";
-   	int n;
+   	int n=0;
     
     
 
@@ -92,37 +92,56 @@ int main(int argc, char *argv[]){
 	            //si no se pudo abrir el puerto
 	            if (fd == -1) exit(EXIT_SUCCESS);
 
-	            Configure_Port(fd,B9600,"8N1");   
+	            Configure_Port(fd,B9600,(char*)"8N1");   
 
 	        break;
 	        
 	        case 'r':
+	        	system("clear");
 	        	if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
-	        	printf("Esperando texto del emisor..\n");
+		       	printf("Esperando texto del emisor...\n");
 
-	        	//Esperar hasta que se llene el bufer
-	        	while(Kbhit_Port(fd)<bufmax);
+		        //Esperar hasta que se llene el bufer
+		        while(Kbhit_Port(fd) < bufmax);
 
-    			n=Read_Port(fd,texto,bufmax);
+	    		n=Read_Port(fd,texto,bufmax);
 
-	        	//strcpy(texto,optarg);
-	        	printf("El texto recibido es: %s ...\n",texto);
-          
-	            Close_Port(fd);	            
+		        printf("Texto recibido: %s\n",texto);
+	            
             break;
 
             case 'R':
+            	system("clear");
 				if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
 	        	strcpy(rutaGuarda,optarg);
-	        	printf("Recibiendo archivo...\n");
+	        	printf("\nRecibiendo archivo...\n\n");
+				
+				printf("%s\n",rutaGuarda);
+				printf("====================================\n");
+
+	        	for (int i = 0; i < 4; ++i){
+
+
+		        	//Esperar hasta que se llene el bufer
+		        	while(Kbhit_Port(fd) < bufmax);
+
+	    			n=Read_Port(fd,texto,bufmax);
+
+		        	printf("%s",texto);
+	        		
+	        		//printf("Kbhit_Port(fd) ->%d\n",Kbhit_Port(fd) );
+	        	}
+
+				printf("====================================\n");                     
 	            
             break;
         
         }
     }
 
+    Close_Port(fd);	            
     exit(EXIT_SUCCESS);
 }
 

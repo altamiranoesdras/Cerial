@@ -11,6 +11,10 @@ void error(char* msg){
     exit(EXIT_FAILURE);
 }
 
+void tiempoFuera(int segundos){
+	usleep(segundos * 1000000);
+}
+
 void modoUso(void){
     printf("Modo de uso: ./Emisor -b <bps> -p <puerto> [Opciones]\n"
     "\n"
@@ -30,24 +34,22 @@ void modoUso(void){
 
 int main(int argc, char *argv[]){
 
-	const int bufmax = 256;//maximo tamaño de las cadenas
+	int bufmax = 256;//maximo tamaño de las cadenas
 
 	HANDLE fd = -1; //manejador
     DCB OldConf; //configuracion antigua
    	
     char strport[bufmax]="/dev/ttyUSB0";
     int  velocidad = 9600;  // default
-   	char texto[bufmax]="Hola Mundo";
+   	char texto[bufmax]="Hola Mundo\n";
    	char rutaArchivo[bufmax]="";
-   	int keep=1;
+   	
    	char sn[2]="S";
+   	int keep=0;
    	int i=0;
     
-    
 
-	if (argc==1){
-		modoUso();
-	}
+	if (argc==1){ modoUso();}
 
 	/* Parseo de opciones */
     int option_index = 0, opt;
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]){
 	            //si no se pudo abrir el puerto
 	            if (fd == -1) exit(EXIT_SUCCESS);
 
-	            Configure_Port(fd,B9600,"8N1");   
+	            Configure_Port(fd,B9600,(char*)"8N1");   
 
 	        break;
 
@@ -109,46 +111,50 @@ int main(int argc, char *argv[]){
 
 	        	strcpy(texto,optarg);
 	        		
-	        	
-	        	do
-	        	{
+	        	do{
 		        	
-	        		printf("Enviando texto: %s ...\n",texto);
+	        		printf("Enviando texto: %s\n",texto);
 	        		Write_Port(fd,texto,bufmax);
-	        		usleep(5 * 100000 ); // sleep milliseconds            
-
-	        		/*
-	        		if(i==15){
-
-	        			printf("Desea continuar enviando \n");
-	        			scanf("%s",sn);
-
-	        			if(strcmp(sn,"n")==0 || strcmp(sn,"N")==0) 
-	        				keep=0;
-	        			else
-	        				i=0;
-	        		}*/
-
-	        		i++;
+	        		tiempoFuera(3);
 		        		        		
-	        	} while (keep);
-
-
-
-	            Close_Port(fd);
+	        	}while (keep);
 	            
             break;
 
             case 'f':
-				if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
+            	system("clear");
+				//if( fd == -1 ) error((char*) "El puerto serial no esta abierto");
 
 	        	strcpy(rutaArchivo,optarg);
-	        	printf("Enviando archivo: %s ...\n",rutaArchivo);
-	            
+	        	printf("\nEnviando archivo...\n\n");
+				
+				printf("%s\n",rutaArchivo);
+				printf("====================================\n");
+				FILE *archivo;
+ 	
+			 	char linea[bufmax];
+			 	
+			 	archivo = fopen("archivo.txt","r");
+			 	
+			 	if (archivo == NULL)
+			 		exit(1);
+			 	
+			 	
+			 	while (feof(archivo) == 0){
+			 		tiempoFuera(3);
+			 		fgets(linea,bufmax,archivo);
+			 		printf("%s",linea);
+			 		Write_Port(fd,texto,bufmax);
+			 	}
+
+				printf("\n====================================\n\n");
+
+			    fclose(archivo);     
             break;
         
         }
     }
 
+    Close_Port(fd);
     exit(EXIT_SUCCESS);
 }
