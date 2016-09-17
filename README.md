@@ -10,5 +10,5 @@ Comunicación serial entre computadoras en lenguaje C
 
 --Enviar y recibir archivos
 
-./Emisor -p /dev/ttyUSB0 -f rutaArchivo
-./Receptor -p /dev/ttyUSB0 -R rutaGuardaArchivo
+./Emisor -p /dev/ttyUSB0 -f archivo.txt
+./Receptor -p /dev/ttyUSB0 -R nuevo.txt
