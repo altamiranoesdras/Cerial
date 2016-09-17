@@ -32,9 +32,11 @@ void modoUso(void){
     exit(EXIT_SUCCESS);
 }
 
+#define bufmax 256
+
 int main(int argc, char *argv[]){
 
-	int bufmax = 256;//maximo tamaño de las cadenas
+	//const int bufmax = 256;//maximo tamaño de las cadenas
 
 	HANDLE fd = -1; //manejador
     DCB OldConf; //configuracion antigua
